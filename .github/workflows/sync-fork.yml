@@ -2,8 +2,8 @@ name: Sync Fork with Upstream
 
 on:
   schedule:
-    # Runs every day at 00:00 UTC
-    - cron: '0 0 * * *'
+    # Poll upstream every 30 minutes; the sync step is skipped when already up to date
+    - cron: '*/30 * * * *'
   workflow_dispatch:
 
 jobs:
@@ -27,6 +27,15 @@ jobs:
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git remote add upstream https://github.com/E3zz/proxima-care-partners.git
           git fetch upstream
+
+          # Skip if fork is already up to date with upstream
+          BEHIND=$(git rev-list --count HEAD..upstream/main)
+          if [ "$BEHIND" -eq 0 ]; then
+            echo "Already up to date with upstream. Nothing to sync."
+            exit 0
+          fi
+
+          echo "Fork is $BEHIND commit(s) behind upstream. Syncing..."
 
           if ! git merge upstream/main --no-edit; then
             echo "::error::Merge conflict detected while syncing with upstream." \
