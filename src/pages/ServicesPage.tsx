@@ -1,19 +1,6 @@
-import { useRef, useEffect, useState } from 'react';
 import SEO from '../components/SEO';
 import CTA from '../components/CTA';
-
-function useInView(threshold = 0.02) {
-  const ref = useRef<HTMLDivElement>(null);
-  const [inView, setInView] = useState(false);
-  useEffect(() => {
-    const observer = new IntersectionObserver(([entry]) => {
-      if (entry.isIntersecting) { setInView(true); observer.disconnect(); }
-    }, { threshold, rootMargin: '50px' });
-    if (ref.current) observer.observe(ref.current);
-    return () => observer.disconnect();
-  }, [threshold]);
-  return { ref, inView };
-}
+import useInView from '../hooks/useInView';
 
 const services = [
   {
@@ -242,18 +229,16 @@ export default function ServicesPage() {
             {services.map((service, i) => (
               <div
                 key={i}
-                className={`rounded-2xl p-8 flex flex-col transition-all duration-700 hover:shadow-xl hover:shadow-teal-900/20 hover:-translate-y-1 ${service.highlight
-                  ? 'lg:col-span-2 bg-[#1b263b] border border-teal-500/20 shadow-lg glow-teal relative overflow-hidden'
-                  : 'glass-card'
+                className={`glass-card rounded-2xl p-8 bento-card flex flex-col relative overflow-hidden transition-all duration-700 ${service.highlight
+                  ? 'lg:col-span-2 shadow-lg'
+                  : ''
                   } ${inView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}
                 style={{ transitionDelay: `${i * 80 + 100}ms` }}
               >
-                {service.highlight && (
-                   <div className="absolute top-0 right-0 w-[400px] h-[400px] bg-teal-500/10 rounded-full blur-[80px] pointer-events-none" />
-                )}
-                <div className="flex items-start gap-5 relative z-10">
-                  <div className="w-14 h-14 rounded-xl bg-teal-500/15 border border-teal-500/20 flex items-center justify-center flex-shrink-0">
-                    <span className="material-symbols-outlined text-[28px] text-teal-400">{service.icon}</span>
+                <div className="absolute top-0 right-0 w-32 h-32 bg-teal-500/10 rounded-full blur-[40px] pointer-events-none" />
+                <div className="flex flex-col lg:flex-row items-start gap-6 relative z-10">
+                  <div className="w-14 h-14 rounded-xl bg-teal-500/10 border border-teal-500/20 flex items-center justify-center flex-shrink-0">
+                    <span className="material-symbols-outlined text-[28px] text-teal-400 icon-glow">{service.icon}</span>
                   </div>
                   <div className="flex-1">
                     <h2
@@ -281,7 +266,11 @@ export default function ServicesPage() {
         </div>
       </section>
 
-      <CTA />
+      <CTA 
+        pillText="Custom Solutions"
+        title={<>Need Additional Services? <br /><span className="text-shimmer">Give Us a Call</span></>}
+        description="If you need specialized billing solutions or services not listed here, our experts can tailor a comprehensive plan designed specifically for your practice."
+      />
     </>
   );
 }

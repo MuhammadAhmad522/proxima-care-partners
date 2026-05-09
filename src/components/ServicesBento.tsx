@@ -1,5 +1,5 @@
-import { useRef, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
+import useInView from '../hooks/useInView';
 
 const services = [
   {
@@ -11,6 +11,7 @@ const services = [
     span: 'md:col-span-2',
     accent: true,
     learnMore: 'Learn more about RCM',
+    linkTo: '/rcm-process',
   },
   {
     icon: 'fact_check',
@@ -21,6 +22,7 @@ const services = [
     span: '',
     accent: false,
     learnMore: '',
+    linkTo: '',
   },
   {
     icon: 'gavel',
@@ -31,6 +33,7 @@ const services = [
     span: '',
     accent: false,
     learnMore: '',
+    linkTo: '',
   },
   {
     icon: 'monitoring',
@@ -42,6 +45,7 @@ const services = [
     accent: false,
     dark: true,
     learnMore: 'View Demo Report',
+    linkTo: '/demo-report',
   },
   {
     icon: 'local_hospital',
@@ -52,21 +56,9 @@ const services = [
     span: '',
     accent: false,
     learnMore: '',
+    linkTo: '',
   },
 ];
-
-function useInView(threshold = 0.02) {
-  const ref = useRef<HTMLDivElement>(null);
-  const [inView, setInView] = useState(false);
-  useEffect(() => {
-    const observer = new IntersectionObserver(([entry]) => {
-      if (entry.isIntersecting) { setInView(true); observer.disconnect(); }
-    }, { threshold, rootMargin: '50px' });
-    if (ref.current) observer.observe(ref.current);
-    return () => observer.disconnect();
-  }, [threshold]);
-  return { ref, inView };
-}
 
 export default function ServicesBento() {
   const { ref, inView } = useInView();
@@ -99,31 +91,23 @@ export default function ServicesBento() {
           {services.map((service, i) => (
             <div
               key={i}
-              className={`bento-card rounded-xl ${service.span || ''} ${
-                service.dark
-                  ? 'bg-teal-600/10 border border-teal-500/25'
-                  : service.accent
-                  ? 'bg-white/6 border border-teal-500/20'
-                  : 'bg-white/4 border border-white/8'
-              } p-8 flex flex-col transition-all duration-700 ${
+              className={`glass-card bento-card rounded-2xl ${service.span || ''} p-8 flex flex-col relative overflow-hidden group transition-all duration-700 hover:border-teal-500/30 ${
                 inView ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-12'
               }`}
               style={{ transitionDelay: `${i * 90 + 200}ms` }}
             >
+              <div className="absolute top-0 right-0 w-32 h-32 bg-teal-500/10 rounded-full blur-[40px] pointer-events-none group-hover:bg-teal-500/20 transition-colors" />
+
               {/* Icon */}
-              <div className={`w-13 h-13 rounded-xl flex items-center justify-center mb-6 ${
-                service.dark ? 'bg-teal-500/15 border border-teal-500/20' : 'bg-white/8 border border-white/10'
-              }`}
-                style={{ width: '52px', height: '52px' }}
-              >
-                <span className="material-symbols-outlined text-[26px] text-teal-400">
+              <div className="relative z-10 w-14 h-14 rounded-xl bg-teal-500/10 border border-teal-500/20 flex items-center justify-center mb-6 group-hover:bg-teal-500/20 transition-colors">
+                <span className="material-symbols-outlined text-[28px] text-teal-400 icon-glow">
                   {service.icon}
                 </span>
               </div>
 
               {/* Title */}
               <h3
-                className="font-bold mb-3 text-white"
+                className="font-bold mb-3 text-white relative z-10"
                 style={{ fontFamily: 'Manrope, sans-serif', fontSize: '19px', lineHeight: '1.4' }}
               >
                 {service.title}
@@ -131,14 +115,14 @@ export default function ServicesBento() {
 
               {/* Description */}
               <p
-                className="mb-6 leading-relaxed flex-1 text-slate-400"
+                className="mb-6 leading-relaxed flex-1 text-slate-400 relative z-10"
                 style={{ fontFamily: 'Inter, sans-serif', fontSize: '14px', lineHeight: '1.8' }}
               >
                 {service.description}
               </p>
 
               {/* Features */}
-              <div className="flex flex-wrap gap-2 mb-5">
+              <div className="flex flex-wrap gap-2 mb-5 relative z-10">
                 {service.features.map((f, j) => (
                   <span
                     key={j}
@@ -152,12 +136,12 @@ export default function ServicesBento() {
 
               {/* Learn More Link */}
               {service.learnMore && (
-                <div className="flex items-center gap-1.5 text-sm font-semibold group cursor-pointer text-teal-400 hover:text-teal-300 transition-colors">
+                <Link to={service.linkTo} className="flex items-center gap-1.5 text-sm font-semibold group cursor-pointer text-teal-400 hover:text-teal-300 transition-colors relative z-10 w-fit">
                   <span>{service.learnMore}</span>
                   <span className="material-symbols-outlined text-[18px] transition-transform duration-300 group-hover:translate-x-1">
                     arrow_forward
                   </span>
-                </div>
+                </Link>
               )}
             </div>
           ))}
@@ -170,11 +154,11 @@ export default function ServicesBento() {
         >
           <Link
             to="/services"
-            className="inline-flex items-center gap-2 border border-white/10 bg-white/5 text-white px-10 py-4 font-bold hover:bg-white/10 hover:border-teal-500/30 transition-all duration-300 rounded-sm text-sm group"
+            className="inline-flex items-center justify-center gap-2 border border-white/10 bg-white/5 text-white px-4 py-3 sm:px-10 sm:py-4 font-bold hover:bg-white/10 hover:border-teal-500/30 transition-all duration-300 rounded-lg text-[13px] sm:text-sm group"
             style={{ fontFamily: 'Inter, sans-serif' }}
           >
             View All Services
-            <span className="material-symbols-outlined text-[18px] transition-transform duration-300 group-hover:translate-x-1">arrow_forward</span>
+            <span className="material-symbols-outlined text-[16px] sm:text-[18px] transition-transform duration-300 group-hover:translate-x-1">arrow_forward</span>
           </Link>
         </div>
       </div>
